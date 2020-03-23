@@ -6,7 +6,7 @@ module.exports = {
         const run =  new runModel
     ({
             ...req.body,
-            author: req.user._id
+            driver: req.user._id
         })
         try {
             await run.save()

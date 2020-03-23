@@ -4,9 +4,12 @@ const {ObjectID} = require('mongodb');
 
 module.exports = {
     create : async (req,res) => {
+
+        delete req.body.createdAt
+        delete req.body.lastUpdate
+
         const chat =  new chatModel({
-            ...req.body,
-            author: req.user._id
+            ...req.body
         })
         try {
             await chat.save()
@@ -36,6 +39,32 @@ module.exports = {
             res.send(chat);
         } catch (error) {
             res.status(500).send()
+        }
+    },
+    modify :  async (req, res) => {
+        const _id = req.params.id
+        const updates = Object.keys(req.body);
+        const allowedUpdates = ["partecipants"]
+        const isValidOperation  = updates.every((update) => allowedUpdates.includes(update))
+        if(!isValidOperation){
+            return res.status(400).send({error:'Invalid updates'})
+        }
+        if (!ObjectID.isValid(_id)) {
+            return res.status(404).send();
+        }
+        try {
+            const chat = await chatModel.findOne({_id: req.params.id, 'partecipants.partecipant': req.user._id })
+            
+           if(!chat){
+               return res.status(404).send();
+           }
+    
+           updates.forEach((update) => chat[update] = req.body[update])
+           await chat.save()
+    
+           res.send(chat);
+        } catch (error) {
+            res.status(400).send();
         }
     },
     writeMessage : async (req,res) => {   
