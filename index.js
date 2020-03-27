@@ -25,7 +25,7 @@ app.use(function(req, res, next) {
     next();
 });
 
-var port = process.env.SERVER_PORT;
+var port = process.env.PORT || process.env.SERVER_PORT;
 
 app.get('/', (req, res) => res.send('Hello World with Express'));
 
