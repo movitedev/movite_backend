@@ -4,6 +4,7 @@ const {ObjectID} = require('mongodb');
 
 module.exports = {
     create : async (req,res) => {
+        delete req.body.createdAt
         const event =  new eventModel({
             ...req.body,
             author: req.user._id

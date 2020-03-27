@@ -7,6 +7,16 @@ module.exports = {
         delete req.body.validRunCode
         delete req.body.tokens
         delete req.body.createdAt
+
+        try {
+            const sameEmail = await userModel.findOne({ email: req.body.email })
+            if(sameEmail){
+                return res.status(409).send()
+            }
+        } catch (error) {
+            return res.status(500).send()
+        }
+
         let user = new userModel(req.body);
         try{
             const token = await user.newAuthToken()

@@ -20,7 +20,7 @@ const messageSchema  = new mongoose.Schema({
     createdAt:{
         type: Date,
         required: true,
-        default: Date.now
+        default: Date.now()
     }
 });
 
@@ -29,7 +29,6 @@ messageSchema.pre('save', async function(next){
     const chat = await chatModel.findOne({_id: message.chatId})
     
     if(chat){
-        chat.lastUpdate = Date.now()
         await chat.save()
     }
     

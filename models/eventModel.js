@@ -23,9 +23,10 @@ const eventSchema  = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref:'Run'
         }
-    }],    createdAt:{
+    }],
+    createdAt:{
         type: Date,
-        default: Date.now
+        default: Date.now()
     }
 });
 

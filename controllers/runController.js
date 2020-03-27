@@ -3,6 +3,7 @@ const {ObjectID} = require('mongodb');
 
 module.exports = {
     create : async (req,res) => {
+        delete req.body.createdAt
         const run =  new runModel
     ({
             ...req.body,

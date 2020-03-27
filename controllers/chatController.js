@@ -4,15 +4,17 @@ const {ObjectID} = require('mongodb');
 
 module.exports = {
     create : async (req,res) => {
-
         delete req.body.createdAt
-        delete req.body.lastUpdate
-
         const chat =  new chatModel({
             ...req.body
         })
         try {
             await chat.save()
+
+            var io = req.app.get('socketio');
+            
+            io.of('/chats').sockets.in("chatId-"+chat._id).emit('message', message);
+
             res.status(201).send(chat)
         } catch (error) {
             res.status(400).send(error)
@@ -36,6 +38,7 @@ module.exports = {
             if(!chat){
                 return res.status(404).send()
             }
+            await chat.populate('partecipants.partecipant').execPopulate()
             res.send(chat);
         } catch (error) {
             res.status(500).send()
@@ -54,7 +57,6 @@ module.exports = {
         }
         try {
             const chat = await chatModel.findOne({_id: req.params.id, 'partecipants.partecipant': req.user._id })
-            
            if(!chat){
                return res.status(404).send();
            }
@@ -92,6 +94,11 @@ module.exports = {
     
         try {
             await message.save()
+
+            var io = req.app.get('socketio');
+            
+            io.of('/messages').sockets.in("chatId-"+chat._id).emit('message', message);
+
             res.status(201).send(message)
         } catch (error) {
             res.status(400).send(error)
@@ -124,7 +131,7 @@ module.exports = {
     },
     getAllChats : async (req,res) => {
         try {
-            const chats = await chatModel.find({ _id })
+            const chats = await chatModel.find({})
             res.send(chats)
         } catch (error) {
             res.status(500).send()

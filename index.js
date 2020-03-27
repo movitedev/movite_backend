@@ -19,6 +19,12 @@ app.use(bodyParser.urlencoded({
 
 app.use(bodyParser.json());
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 var port = process.env.SERVER_PORT;
 
 app.get('/', (req, res) => res.send('Hello World with Express'));
@@ -29,6 +35,14 @@ app.use(eventRoutes);
 app.use(runRoutes);
 app.use(chatRoutes);
 
-app.listen(port, function () {
+var server = app.listen(port, function () {
     console.log("Running ApiServer on port " + port);
 });
+
+var io = require('socket.io')(server);
+
+app.set('socketio', io);
+
+require('./sockets/chatsSocket')(io);
+require('./sockets/messagesSocket')(io);
+

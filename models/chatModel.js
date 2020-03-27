@@ -6,17 +6,22 @@ const chatSchema  = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             required:true,
             ref:'User'
+        },
+        lastView:{
+            type: Date,
+            required: true,
+            default: Date(0)
         }
     }],
     lastUpdate:{
         type: Date,
         required: true,
-        default: Date.now
+        default: Date.now()
     },
     createdAt:{
         type: Date,
         immutable: true,
-        default: Date.now
+        default: Date.now()
     }
 });
 
@@ -27,7 +32,19 @@ chatSchema.virtual('messages', {
 })
 
 chatSchema.pre('save', function (next) {
-    this.partecipants = [ ...new Set(this.partecipants)]
+    this.lastUpdate = Date.now()
+
+    let arr = this.partecipants;
+
+    const result = [];
+    arr.sort((a,b) => a.partecipant - b.partecipant);
+    arr.forEach(el => {
+    const last = result[result.length-1];
+    if (el.partecipant === last.partecipant) continue;
+    result.push(el);
+    });
+
+    this.partecipants = result;
     next();
   });
 

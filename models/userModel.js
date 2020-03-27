@@ -69,13 +69,13 @@ const userSchema =  new mongoose.Schema({
         },
         generatedAt:{
             type: Date,
-            default: Date.now
+            default: Date.now()
         }
     },
     createdAt:{
         type: Date,
         immutable: true,
-        default: Date.now
+        default: Date.now()
     }
 });
 

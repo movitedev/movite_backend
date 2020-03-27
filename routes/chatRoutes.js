@@ -7,7 +7,7 @@ const chatController = require('../controllers/chatController');
 router.get('/chats', authenticate.authUser, chatController.getAll);
 router.post('/chats', authenticate.authUser, chatController.create);
 router.get('/chats/:id',authenticate.authUser, chatController.getOne);
-router.patch('/chats', authenticate.authUser, chatController.modify);
+router.patch('/chats/:id', authenticate.authUser, chatController.modify);
 router.post('/chats/:id/messages',authenticate.authUser, chatController.writeMessage);
 router.get('/chats/:id/messages', chatController.getMessagesOfChat);
 router.delete('/chats/:id', authenticate.authUser, chatController.remove);
