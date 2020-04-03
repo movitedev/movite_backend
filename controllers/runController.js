@@ -93,12 +93,7 @@ module.exports = {
             .findOne({ 'validRunCode.code': req.body.code})
                 if(!user || user==req.user){
                     return res.status(400).send()
-                } else{
-
-                    if ((run.validated).some(e => e.passenger.equals(user._id))) {
-                        return res.status(400).send()
-                      }
-                    }
+                }
                 
                 let timeDifference = Math.abs(Date.now() - user.validRunCode.generatedAt.getTime());
                 let timeDifference2 = Math.abs(run.eventDate.getTime() - user.validRunCode.generatedAt.getTime());
@@ -110,8 +105,6 @@ module.exports = {
                 run.validated.push({passenger: user._id})
 
                 await run.save()
-
-
 
                 res.send({passenger: user})
         } catch (error) {

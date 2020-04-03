@@ -34,17 +34,9 @@ chatSchema.virtual('messages', {
 chatSchema.pre('save', function (next) {
     this.lastUpdate = Date.now()
 
-    let arr = this.partecipants;
+    this.partecipants = this.partecipants.filter((elem, index, self) => self.findIndex(
+        (t) => {return (t.partecipant).equals(elem.partecipant)}) === index);
 
-    const result = [];
-    arr.sort((a,b) => a.partecipant - b.partecipant);
-    arr.forEach(el => {
-    const last = result[result.length-1];
-    if (el.partecipant === last.partecipant) continue;
-    result.push(el);
-    });
-
-    this.partecipants = result;
 
     next();
   });
