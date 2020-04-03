@@ -11,9 +11,9 @@ module.exports = {
         try {
             await chat.save()
 
-            var io = req.app.get('socketio');
+            //var io = req.app.get('socketio');
             
-            io.of('/chats').sockets.in("chatId-"+chat._id).emit('message', message);
+            //io.of('/chats').sockets.in("chatId-"+chat._id).emit('message', message);
 
             res.status(201).send(chat)
         } catch (error) {
@@ -22,9 +22,22 @@ module.exports = {
     },
     getAll : async (req,res) => {
         try {
-            const chats = await chatModel.find({ _id, 'partecipants.partecipant': req.user._id })
+            const chats = await chatModel.find({ 'partecipants.partecipant': req.user._id })
+              
+              async function delayedLog(chat) {
+                await chat.populate({path: 'partecipants.partecipant', select: 'name'}).execPopulate()
+              }
+
+            async function processArray(array) {
+                const promises = array.map(delayedLog);
+                await Promise.all(promises);
+              }
+
+              await processArray(chats);
+
             res.send(chats)
         } catch (error) {
+            console.log(error);
             res.status(500).send()
         }
     },
