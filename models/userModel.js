@@ -38,9 +38,8 @@ const userSchema =  new mongoose.Schema({
     },
     password:{
         type:String,
-        required:true,
         trim:true,
-        minlength: 7,
+        minlength: 6,
         validate(value){
             if(validator.isEmpty(value)){
                 throw new Error('Please enter your password!')
@@ -72,11 +71,28 @@ const userSchema =  new mongoose.Schema({
             default: Date.now()
         }
     },
+    activatedUser: {
+        code:{
+            type:String,
+        },
+        active:{
+            type: Boolean,
+            required: true,
+            default: false
+        }
+    },
+    passwordAccount: {
+        type: Boolean,
+        required: true,
+        default: true
+    },
     createdAt:{
         type: Date,
         immutable: true,
         default: Date.now()
     }
+}, {
+    toObject: { virtuals: true }
 });
 
 userSchema.virtual('posts', {
@@ -94,7 +110,7 @@ userSchema.virtual('givenRuns', {
 userSchema.virtual('receivedRuns', {
     ref: 'Run',
     localField: '_id',
-    foreignField: 'passenger'
+    foreignField: 'passengers.passenger'
 })
 
 userSchema.virtual('chats', {
@@ -135,6 +151,14 @@ userSchema.methods.newValidRunCode = async function(){
     return user.validRunCode
 }
 
+userSchema.methods.newEmailCode = async function(){
+    const user  = this
+    const code =  uuidRandom()
+    user.activatedUser.code = code
+    await user.save()
+    return user.activatedUser
+}
+
 userSchema.methods.toJSON = function(){
     const user = this
     const userObj = user.toObject()
@@ -142,6 +166,8 @@ userSchema.methods.toJSON = function(){
     delete userObj.password
     delete userObj.tokens
     delete userObj.validRunCode
+    delete userObj.activatedUser
+    delete userObj.passwordAccount
 
     return userObj
 }

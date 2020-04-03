@@ -38,7 +38,7 @@ module.exports = {
             if(!chat){
                 return res.status(404).send()
             }
-            await chat.populate('partecipants.partecipant').execPopulate()
+            await chat.populate({path: 'partecipants.partecipant', select: 'name'}).execPopulate()
             res.send(chat);
         } catch (error) {
             res.status(500).send()

@@ -45,6 +45,7 @@ chatSchema.pre('save', function (next) {
     });
 
     this.partecipants = result;
+
     next();
   });
 
