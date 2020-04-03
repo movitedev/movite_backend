@@ -9,7 +9,7 @@ router.post('/chats', authenticate.authUser, chatController.create);
 router.get('/chats/:id',authenticate.authUser, chatController.getOne);
 router.patch('/chats/:id', authenticate.authUser, chatController.modify);
 router.post('/chats/:id/messages',authenticate.authUser, chatController.writeMessage);
-router.get('/chats/:id/messages', chatController.getMessagesOfChat);
+router.get('/chats/:id/messages',authenticate.authUser, chatController.getMessagesOfChat);
 router.delete('/chats/:id', authenticate.authUser, chatController.remove);
 router.get('/chats/admin', authenticate.authAdmin, chatController.getAllChats);
 router.get('/chats/admin/:id',authenticate.authAdmin, chatController.getOneChat);

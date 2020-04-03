@@ -110,7 +110,7 @@ userSchema.virtual('givenRuns', {
 userSchema.virtual('receivedRuns', {
     ref: 'Run',
     localField: '_id',
-    foreignField: 'passengers.passenger'
+    foreignField: 'validated.passenger'
 })
 
 userSchema.virtual('chats', {

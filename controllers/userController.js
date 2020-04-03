@@ -103,7 +103,7 @@ module.exports = {
             if(!user){
                 return res.status(404).send()
             }
-            await user.populate('givenRuns').execPopulate()
+            await user.populate('receivedRuns').execPopulate()
             res.send(user.receivedRuns)
         } catch (error) {
             res.status(500).send()
