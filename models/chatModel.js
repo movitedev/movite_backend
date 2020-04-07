@@ -16,12 +16,12 @@ const chatSchema  = new mongoose.Schema({
     lastUpdate:{
         type: Date,
         required: true,
-        default: Date.now()
+        default: Date.now
     },
     createdAt:{
         type: Date,
         immutable: true,
-        default: Date.now()
+        default: Date.now
     }
 });
 
@@ -32,7 +32,6 @@ chatSchema.virtual('messages', {
 })
 
 chatSchema.pre('save', function (next) {
-    this.lastUpdate = Date.now()
 
     this.partecipants = this.partecipants.filter((elem, index, self) => self.findIndex(
         (t) => {return (t.partecipant).equals(elem.partecipant)}) === index);

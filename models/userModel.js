@@ -68,7 +68,7 @@ const userSchema =  new mongoose.Schema({
         },
         generatedAt:{
             type: Date,
-            default: Date.now()
+            default: Date.now
         }
     },
     activatedUser: {
@@ -89,7 +89,7 @@ const userSchema =  new mongoose.Schema({
     createdAt:{
         type: Date,
         immutable: true,
-        default: Date.now()
+        default: Date.now
     }
 }, {
     toObject: { virtuals: true }

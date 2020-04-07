@@ -10,6 +10,7 @@ router.get('/chats/:id',authenticate.authUser, chatController.getOne);
 router.patch('/chats/:id', authenticate.authUser, chatController.modify);
 router.post('/chats/:id/messages',authenticate.authUser, chatController.writeMessage);
 router.get('/chats/:id/messages',authenticate.authUser, chatController.getMessagesOfChat);
+router.post('/chats/:id/read',authenticate.authUser, chatController.readChat);
 router.delete('/chats/:id', authenticate.authUser, chatController.remove);
 router.get('/chats/admin', authenticate.authAdmin, chatController.getAllChats);
 router.get('/chats/admin/:id',authenticate.authAdmin, chatController.getOneChat);

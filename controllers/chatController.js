@@ -11,9 +11,9 @@ module.exports = {
         try {
             await chat.save()
 
-            //var io = req.app.get('socketio');
+            var io = req.app.get('socketio');
             
-            //io.of('/chats').sockets.in("chatId-"+chat._id).emit('message', message);
+            io.of('/messages').to(chat._id).emit('message', 'Chat created');
 
             res.status(201).send(chat)
         } catch (error) {
@@ -110,10 +110,11 @@ module.exports = {
 
             var io = req.app.get('socketio');
             
-            io.of('/messages').sockets.in("chatId-"+chat._id).emit('message', message);
+            io.of('/messages').to(chat._id).emit('message', message);
 
             res.status(201).send(message)
         } catch (error) {
+            console.log(error);
             res.status(400).send(error)
         }
     
@@ -121,8 +122,31 @@ module.exports = {
     getMessagesOfChat : async (req,res) => {
         try {
             const chat = await chatModel.findOne({_id: req.params.id, 'partecipants.partecipant': req.user._id})
+            if(!chat){
+                return res.status(404).send()
+            }
             await chat.populate('messages').execPopulate()
             res.send(chat.messages)
+        } catch (error) {
+            res.status(500).send()
+        }
+    },
+    readChat : async (req,res) => {
+        try {
+            const chat = await chatModel.findOne({_id: req.params.id, 'partecipants.partecipant': req.user._id})
+            if(!chat){
+                return res.status(404).send()
+            }
+
+            for(let i=0; i<chat.partecipants.length; i++){
+
+                if(chat.partecipants[i].partecipant.equals(req.user._id)){
+                    chat.partecipants[i].lastView=Date.now();
+                }
+            }
+
+            await chat.save();
+            res.send(chat)
         } catch (error) {
             res.status(500).send()
         }
