@@ -11,10 +11,14 @@ module.exports = {
         try {
             await chat.save()
 
+            await chat.populate({path: 'partecipants.partecipant', select: 'name'}).execPopulate()
+
             var io = req.app.get('socketio');
             
-            io.of('/messages').to(chat._id).emit('message', 'Chat created');
-
+            chat.partecipants.forEach(element => {
+                io.of('/chats').to(element.partecipant._id).emit('chat', chat);
+            });
+            
             res.status(201).send(chat)
         } catch (error) {
             res.status(400).send(error)
@@ -106,11 +110,33 @@ module.exports = {
         })
     
         try {
+
             await message.save()
+
+            const newchat = await chatModel.findOne({_id: chat._id})
+
+            //update lastRead
+            for(let i=0; i<newchat.partecipants.length; i++){
+
+                if(newchat.partecipants[i].partecipant.equals(req.user._id)){
+                    newchat.partecipants[i].lastView=Date.now();
+                }
+            }
+
+
+
+            await newchat.save();
+
+            await newchat.populate({path: 'partecipants.partecipant', select: 'name'}).execPopulate()
 
             var io = req.app.get('socketio');
             
             io.of('/messages').to(chat._id).emit('message', message);
+
+            (chat.partecipants).forEach(element => {
+                io.of('/chats').to(element.partecipant._id).emit('chat', newchat);
+            });
+
 
             res.status(201).send(message)
         } catch (error) {
@@ -146,6 +172,15 @@ module.exports = {
             }
 
             await chat.save();
+
+            await chat.populate({path: 'partecipants.partecipant', select: 'name'}).execPopulate()
+
+            var io = req.app.get('socketio');
+            
+            (chat.partecipants).forEach(element => {
+                io.of('/chats').to(element.partecipant._id).emit('chat', chat);
+            });
+
             res.send(chat)
         } catch (error) {
             res.status(500).send()
