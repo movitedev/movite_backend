@@ -1,4 +1,5 @@
 const userModel = require('../models/userModel');
+const runModel = require('../models/runModel');
 const {ObjectID} = require('mongodb');
 const verify = require('../social/googleAuth');
 const uuidRandom = require('uuid-random');
@@ -78,6 +79,26 @@ module.exports = {
                 return res.status(404).send()
             }
             res.send(post);
+        } catch (error) {
+            res.status(500).send()
+        }
+    },
+    getStats : async (req,res) => {
+        const _id =  req.params.id
+        if (!ObjectID.isValid(_id)) {
+            return res.status(404).send();
+        }
+        try {
+
+            let stats={};
+
+            let driverNumber = await runModel.countDocuments({driver: _id});
+            let passengerNumber = await runModel.countDocuments({'passengers.passenger': _id});
+
+            stats.driverNumber = driverNumber;
+            stats.passengerNumber = passengerNumber;
+
+            res.send(stats);
         } catch (error) {
             res.status(500).send()
         }
