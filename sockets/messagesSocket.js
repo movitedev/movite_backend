@@ -12,17 +12,18 @@ module.exports = function(io){
   .of('/messages')
   .on('connection', function(socket) {
     // once a client has connected, we expect to get a ping from them saying what room they want to join
-    console.log("Connect");
+    console.log("Connect messages");
 
     socket.on('room', async function(room) {
+
+      //room is chatid
 
       console.log("Room");
 
       if (socket.handshake.query && socket.handshake.query.token){
 
         try {
-          
-  
+
       if (!ObjectID.isValid(room)) {
         throw new Error();
       }

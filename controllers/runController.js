@@ -112,6 +112,111 @@ module.exports = {
             res.status(500).send()
         }
     },
+    addPassenger : async (req,res) => {
+        const _id =  req.params.id
+        const passengerId =  req.params.passengerId
+
+        if (!ObjectID.isValid(_id)) {
+            return res.status(404).send();
+        }
+
+        if (!ObjectID.isValid(passengerId)) {
+            return res.status(404).send();
+        }
+
+        try {
+            const run = await runModel
+        .findOne({_id: _id, driver: req.user._id})
+            
+           if(!run){
+            res.status(404).send();
+           }
+
+           const passenger = await userModel
+           .findOne({_id: passengerId})
+               
+              if(!passenger){
+               res.status(404).send();
+              }
+
+           run.passengers.push({'passenger': passenger});
+
+           await run.save()
+    
+           res.send(run);
+        } catch (error) {
+            res.status(400).send();
+        }
+    },
+    removePassenger : async (req,res) => {
+        const _id =  req.params.id
+        const passengerId =  req.params.passengerId
+
+        if (!ObjectID.isValid(_id)) {
+            return res.status(404).send();
+        }
+
+        if (!ObjectID.isValid(passengerId)) {
+            return res.status(404).send();
+        }
+
+        try {
+            const run = await runModel
+        .findOne({_id: _id, driver: req.user._id, 'passengers.passenger': passengerId})
+            
+           if(!run){
+            res.status(404).send();
+           }
+
+           let toRemove;
+
+           run.passengers.forEach(element => {
+               if(element.passenger.equals(passengerId)){
+                   toRemove = element;
+               }
+           });
+
+           run.passengers.remove(toRemove);
+
+           await run.save()
+    
+           res.send(run);
+        } catch (error) {
+            res.status(400).send();
+        }
+    },
+    leave : async (req,res) => {
+        const _id =  req.params.id
+
+        if (!ObjectID.isValid(_id)) {
+            return res.status(404).send();
+        }
+
+        try {
+            const run = await runModel
+        .findOne({_id: _id, 'passengers.passenger':req.user._id})
+            
+           if(!run){
+            res.status(404).send();
+           }
+
+           let toRemove;
+
+           run.passengers.forEach(element => {
+               if(element.passenger.equals(req.user._id)){
+                   toRemove = element;
+               }
+           });
+
+           run.passengers.remove(toRemove);
+
+           await run.save()
+    
+           res.send(run);
+        } catch (error) {
+            res.status(400).send();
+        }
+    },
     modify :  async (req, res) => {
         const _id = req.params.id
         const updates = Object.keys(req.body);
@@ -125,7 +230,7 @@ module.exports = {
         }
         try {
             const run = await runModel
-        .findOne({_id: req.params.id, author:req.user._id})
+        .findOne({_id: _id, driver:req.user._id})
             
            if(!run){
             res.status(404).send();

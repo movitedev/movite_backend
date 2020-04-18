@@ -11,7 +11,7 @@ module.exports = function(io){
     .of('/chats')
     .on('connection', function(socket) {
     // once a client has connected, we expect to get a ping from them saying what room they want to join
-    console.log("Connect");
+    console.log("Connect chats");
 
     socket.on('room', async function(room) {
 
