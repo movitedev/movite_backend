@@ -32,7 +32,7 @@ module.exports = {
                 // should be replaced with real recipient's account
                 to: user.email,
                 subject: 'Movite account verification',
-                text: 'Tap the link to verify the account: linkToSite/users/activate/' + emailCode
+                text: 'Tap the link to verify the account: https://movite.herokuapp.com/users/activate/' + emailCode
             };
             require('../mail/mailer')(mailOptions);
 

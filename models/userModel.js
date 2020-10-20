@@ -54,7 +54,7 @@ const userSchema = new mongoose.Schema({
         name: {
             type: String,
             trim: true,
-            default: "none",
+            default: "none"
         },
         location: {
             type: {
@@ -179,7 +179,7 @@ userSchema.methods.newEmailCode = async function () {
     const code = uuidRandom()
     user.activatedUser.code = code
     await user.save()
-    return user.activatedUser
+    return user.activatedUser.code
 }
 
 userSchema.methods.toJSON = function () {
