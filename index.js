@@ -12,6 +12,7 @@ const postRoutes = require('./routes/postRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const runRoutes = require('./routes/runRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const messageRoutes = require('./routes/messageRoutes');
 
 app.use(bodyParser.urlencoded({
     extended: true
@@ -34,6 +35,7 @@ app.use(postRoutes);
 app.use(eventRoutes);
 app.use(runRoutes);
 app.use(chatRoutes);
+app.use(messageRoutes);
 
 var server = app.listen(port, function () {
     console.log("Running ApiServer on port " + port);

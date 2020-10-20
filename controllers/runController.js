@@ -14,6 +14,10 @@ module.exports = {
             driver: req.user._id
         })
         try {
+
+            if(Date.now() > run.eventDate){
+                return res.status(409).send()
+            }
             await run.save()
             res.status(201).send(run)
         } catch (error) {
@@ -35,6 +39,54 @@ module.exports = {
             }
             res.send(runs)
         } catch (error) {
+            res.status(500).send()
+        }
+    },
+    find : async (req,res) => {
+
+        let from = req.body.from;
+        let to = req.body.to;
+        let eventDate = req.body.eventDate;
+
+        let spaceOffset = req.body.spaceOffset;
+        let timeOffset = req.body.timeOffset;
+
+        if(!eventDate || !from || !to){
+            return res.status(400).send()
+        }
+
+        eventDate = new Date(eventDate);
+
+        let startDate = new Date(eventDate.getTime() - 1000*60*60);
+        let endDate = new Date(eventDate.getTime() + 1000*60*60);
+
+        if(!spaceOffset){
+            spaceOffset = 5;
+        }
+        if(timeOffset){
+            startDate = new Date(eventDate.getTime() - 1000*60*timeOffset);
+            endDate = new Date(eventDate.getTime() + 1000*60*timeOffset);
+        }
+
+        let r = spaceOffset/6371;
+
+        try {
+            let runs=[]
+            runs = await runModel
+            .find({"eventDate": {"$gte": startDate, "$lte": endDate}, "active": true})
+            .find({"from.location": {
+                "$geoWithin": {
+                 "$centerSphere": [from.location.coordinates, r]
+                }
+               }})
+            .find({"to.location": {
+                "$geoWithin": {
+                    "$centerSphere": [to.location.coordinates, r]
+                }
+            }}).populate('driver')
+            res.send(runs)
+        } catch (error) {
+            console.error(error);
             res.status(500).send()
         }
     },
@@ -139,7 +191,7 @@ module.exports = {
                res.status(404).send();
               }
 
-           run.passengers.push({'passenger': passenger});
+           run.passengers.push({passenger: passenger.id});
 
            await run.save()
     

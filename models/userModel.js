@@ -9,50 +9,70 @@ dotenv.config();
 
 const postModel = require('./postModel');
 
-const userSchema =  new mongoose.Schema({
-    name:{
+const userSchema = new mongoose.Schema({
+    name: {
         type: String,
         required: true,
         trim: true
     },
-    age:{
+    age: {
         type: Number,
         default: 0,
-        validate(value){
-            if(value < 0){
+        validate(value) {
+            if (value < 0) {
                 throw new Error('Age must be a positive number')
             }
         }
     },
-    email:{
+    email: {
         type: String,
         required: true,
-        unique:true,
+        unique: true,
         trim: true,
-        validate(value){
-            if(!validator.isEmail(value)){
+        validate(value) {
+            if (!validator.isEmail(value)) {
                 throw new Error('Email is invalid!')
             }
         }
 
     },
-    password:{
-        type:String,
-        trim:true,
+    password: {
+        type: String,
+        trim: true,
         minlength: 6,
-        validate(value){
-            if(validator.isEmpty(value)){
+        validate(value) {
+            if (validator.isEmpty(value)) {
                 throw new Error('Please enter your password!')
-            }else if(validator.equals(value.toLowerCase(),"password")){
+            } else if (validator.equals(value.toLowerCase(), "password")) {
                 throw new Error('Password is invalid!')
-            }else if(validator.contains(value.toLowerCase(), "password")){
+            } else if (validator.contains(value.toLowerCase(), "password")) {
                 throw new Error('Password should not contain password!')
             }
         }
     },
-    tokens:[{
-        token:{
-            type:String,
+    home: {
+        name: {
+            type: String,
+            trim: true,
+            default: "none",
+        },
+        location: {
+            type: {
+                type: String,
+                enum: ['Point'],
+                required: true,
+                default: 'Point'
+            },
+            coordinates: {
+                type: [Number],
+                required: true,
+                default: [0, 0]
+            }
+        }
+    },
+    tokens: [{
+        token: {
+            type: String,
             required: true
         }
     }],
@@ -63,19 +83,19 @@ const userSchema =  new mongoose.Schema({
         enum: ['USER', 'MODERATOR', 'ADMIN']
     },
     validRunCode: {
-        code:{
-            type:String,
+        code: {
+            type: String,
         },
-        generatedAt:{
+        generatedAt: {
             type: Date,
             default: Date.now
         }
     },
     activatedUser: {
-        code:{
-            type:String,
+        code: {
+            type: String,
         },
-        active:{
+        active: {
             type: Boolean,
             required: true,
             default: false
@@ -86,7 +106,7 @@ const userSchema =  new mongoose.Schema({
         required: true,
         default: true
     },
-    createdAt:{
+    createdAt: {
         type: Date,
         immutable: true,
         default: Date.now
@@ -120,49 +140,49 @@ userSchema.virtual('chats', {
 })
 
 userSchema.statics.checkValidCredentials = async (email, password) => {
-    const user = await User.findOne({email})
+    const user = await User.findOne({ email })
 
-    if(!user){
+    if (!user) {
         throw new Error('Unable to login 2')
     }
 
-    if(user.passwordAccount){
-    const isMatch = await bcrypt.compare(password,user.password)
+    if (user.passwordAccount) {
+        const isMatch = await bcrypt.compare(password, user.password)
 
-    if(!isMatch){
-        throw new Error('Unable to login 2')
+        if (!isMatch) {
+            throw new Error('Unable to login 2')
+        }
     }
-}
 
     return user
 }
 
-userSchema.methods.newAuthToken = async function(){
-    const user  = this
-    const token =  jwt.sign({ _id: user.id.toString()}, process.env.JWT_SECRET)
+userSchema.methods.newAuthToken = async function () {
+    const user = this
+    const token = jwt.sign({ _id: user.id.toString() }, process.env.JWT_SECRET)
     user.tokens = user.tokens.concat({ token })
     await user.save()
     return token
 }
 
-userSchema.methods.newValidRunCode = async function(){
-    const user  = this
-    const code =  uuidRandom()
+userSchema.methods.newValidRunCode = async function () {
+    const user = this
+    const code = uuidRandom()
     user.validRunCode.code = code
     user.validRunCode.generatedAt = Date.now()
     await user.save()
     return user.validRunCode
 }
 
-userSchema.methods.newEmailCode = async function(){
-    const user  = this
-    const code =  uuidRandom()
+userSchema.methods.newEmailCode = async function () {
+    const user = this
+    const code = uuidRandom()
     user.activatedUser.code = code
     await user.save()
     return user.activatedUser
 }
 
-userSchema.methods.toJSON = function(){
+userSchema.methods.toJSON = function () {
     const user = this
     const userObj = user.toObject()
 
@@ -176,18 +196,18 @@ userSchema.methods.toJSON = function(){
 }
 
 //hash the plain text password before saving
-userSchema.pre('save', async function(next){
+userSchema.pre('save', async function (next) {
     const user = this
 
-    if(user.isModified('password')){
+    if (user.isModified('password')) {
         user.password = await bcrypt.hash(user.password, 8)
     }
     next()
 })
 
-userSchema.pre('remove', async function(next){
+userSchema.pre('remove', async function (next) {
     const user = this
-    await postModel.deleteMany({author: user._id})
+    await postModel.deleteMany({ author: user._id })
     next()
 })
 

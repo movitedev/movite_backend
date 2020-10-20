@@ -137,6 +137,8 @@ module.exports = {
                 io.of('/chats').to(element.partecipant._id).emit('chat', newchat);
             });
 
+            console.log(message);
+
 
             res.status(201).send(message)
         } catch (error) {

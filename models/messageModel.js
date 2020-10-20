@@ -2,37 +2,46 @@ const mongoose = require('mongoose');
 
 const chatModel = require('./chatModel');
 
-const messageSchema  = new mongoose.Schema({
-    message:{
-        type:String,
+const messageSchema = new mongoose.Schema({
+    message: {
+        type: String,
         trim: true
     },
-    author:{
+    author: {
         type: mongoose.Schema.Types.ObjectId,
-        required:true,
-        ref:'User'
+        required: true,
+        ref: 'User'
     },
-    chatId:{
+    chatId: {
         type: mongoose.Schema.Types.ObjectId,
-        required:true,
-        ref:'Chat'
+        required: true,
+        ref: 'Chat'
     },
-    createdAt:{
+    activeRequest: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    run: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Run'
+    },
+    createdAt: {
         type: Date,
         required: true,
         default: Date.now
     }
 });
 
-messageSchema.pre('save', async function(next){
+messageSchema.pre('save', async function (next) {
     const message = this
-    const chat = await chatModel.findOne({_id: message.chatId})
-    
-    if(chat){
+    const chat = await chatModel.findOne({ _id: message.chatId })
+
+    if (chat) {
         chat.lastUpdate = Date.now();
         await chat.save()
     }
-    
+
     next()
 })
 
