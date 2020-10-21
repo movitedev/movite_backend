@@ -94,26 +94,26 @@ runSchema.methods.details = async function () {
     return runObj
 }
 
-runSchema.path('passengers').validate(function(passengers){
+runSchema.path('passengers').validate(function (passengers) {
 
     const run = this
 
-    for(let elem of passengers) {
+    for (let elem of passengers) {
 
-        if((run.driver).equals(elem.passenger)){
+        if ((run.driver).equals(elem.passenger)) {
             return false;
         }
     };
     return true;
 }, 'Same user');
 
-runSchema.path('validated').validate(function(validated){
+runSchema.path('validated').validate(function (validated) {
 
     const run = this
 
-    for(let elem of validated) {
+    for (let elem of validated) {
 
-        if((run.driver).equals(elem.passenger)){
+        if ((run.driver).equals(elem.passenger)) {
             return false;
         }
     };
@@ -128,9 +128,9 @@ runSchema.pre('save', async function (next) {
     run.validated = run.validated.filter((elem, index, self) => self.findIndex(
         (t) => { return (t.passenger).equals(elem.passenger) }) === index);
 
-        console.log(run.passengers);
-        console.log(run.validated);
-        console.log(run.passengers.concat(run.validated));
+    console.log(run.passengers);
+    console.log(run.validated);
+    console.log(run.passengers.concat(run.validated));
 
 
     run.passengers = (run.passengers.concat(run.validated)).filter((elem, index, self) => self.findIndex(

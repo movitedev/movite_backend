@@ -15,14 +15,9 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    age: {
-        type: Number,
-        default: 0,
-        validate(value) {
-            if (value < 0) {
-                throw new Error('Age must be a positive number')
-            }
-        }
+    birth: {
+        type: Date,
+        default: Date.now
     },
     email: {
         type: String,
@@ -114,6 +109,14 @@ const userSchema = new mongoose.Schema({
 }, {
     toObject: { virtuals: true }
 });
+
+userSchema.virtual('age').get(function () {
+    if (this.birth) {
+        return Math.floor((Date.now() - this.birth.getTime()) / (1000 * 3600 * 24 * 365));
+    } else {
+        return 0;
+    }
+})
 
 userSchema.virtual('posts', {
     ref: 'Post',

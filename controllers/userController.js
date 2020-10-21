@@ -132,7 +132,7 @@ module.exports = {
     },
     modifyMe: async (req, res) => {
         const updates = Object.keys(req.body)
-        const allowedUpdates = ["name", "password", "age", "home", "passwordAccount"]
+        const allowedUpdates = ["name", "password", "birth", "home", "passwordAccount"]
         const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
         const _id = req.user._id
 
@@ -219,9 +219,9 @@ module.exports = {
 
             let mailOptions = {
                 // should be replaced with real recipient's account
-                to: req.body.email,
+                to: user.email,
                 subject: 'Movite account verification',
-                text: 'Tap the link to verify the account: linkToSite/users/activate/' + emailCode
+                text: 'Tap the link to verify the account: https://movite.herokuapp.com/users/activate/' + emailCode
             };
 
             require('../mail/mailer')(mailOptions);
@@ -254,7 +254,7 @@ module.exports = {
     modifyUser: async (req, res) => {
         const _id = req.params.id
         const updates = Object.keys(req.body);
-        const allowedUpdates = ["name", "age", "home", "role"]
+        const allowedUpdates = ["name", "birth", "home", "role"]
         const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
         if (!isValidOperation) {
             return res.status(400).send({ error: 'Invalid updates' })
